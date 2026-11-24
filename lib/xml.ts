@@ -5,20 +5,15 @@
 
 import vm from 'node:vm'
 
-// libxml2-wasm is ESM-only and uses top-level await, so it can neither be
-// statically imported nor require()'d from the CommonJS build output. The
-// Function wrapper keeps this a native dynamic import() that tsc won't rewrite.
-// eslint-disable-next-line no-new-func -- intentional: hides import() from tsc's CommonJS down-level transform
-const dynamicImport = new Function('specifier', 'return import(specifier)') as (specifier: string) => Promise<any>
 let libxml2Promise: Promise<any> | undefined
 
 async function loadLibxml2 () {
   if (libxml2Promise == null) {
     libxml2Promise = (async () => {
-      const libxml2 = await dynamicImport('libxml2-wasm')
+      const libxml2 = await import('libxml2-wasm')
       // Grants the WASM sandbox host filesystem access so external entities
       // like file:///etc/passwd resolve - required for the XXE challenges.
-      const { xmlRegisterFsInputProviders } = await dynamicImport('libxml2-wasm/lib/nodejs.mjs')
+      const { xmlRegisterFsInputProviders } = await import('libxml2-wasm/lib/nodejs.mjs')
       xmlRegisterFsInputProviders()
       return libxml2
     })()
