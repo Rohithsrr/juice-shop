@@ -259,8 +259,9 @@ function solveNextCaptcha () {
     .invoke('text')
     .then((val) => {
       cy.get('#captchaControl').clear()
-      // eslint-disable-next-line no-eval
-      const answer = eval(val).toString()
+      // Safely evaluate the simple mathematical expression in the captcha text
+      const sanitizedVal = val.replace(/[^0-9+\-*/().]/g, '')
+      const answer = Function(`'use strict'; return (${sanitizedVal})`)().toString()
       cy.get('#captchaControl').type(answer)
     })
 }
