@@ -7,7 +7,8 @@ import { generateSync } from 'otplib'
 import { buildAssertion, buildAttestation, loadVictimCredential } from './test/api/helpers/passkey'
 
 export default defineConfig({
-  projectId: '3hrkhu',
+  projectId: '
+3hrkhu',
   defaultCommandTimeout: 10000,
   retries: {
     runMode: 2
@@ -42,9 +43,6 @@ export default defineConfig({
               return memory[property]
             }
           }
-        },
-        GetFromConfig (variable: string) {
-          return config.get(variable)
         },
         GetOverwriteUrl () {
           return config.get('challenges.overwriteUrlForProductTamperingChallenge')
