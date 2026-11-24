@@ -84,12 +84,20 @@ describe('/#/basket', () => {
 
         cy.window().then((win) => {
           cy.on('uncaught:exception', (_err, _runnable) => {
-            // Introduced to disable the uncaught:exception we get after the eval under this as TypeError: Date.now is not a function
+            // Introduced to disable the uncaught:exception we get after modifying Date under this as TypeError: Date.now is not a function
             return false
           })
-          win.eval(
-            'event = new Date("March 08, 2019 00:00:00"); Date = function(Date){return function() {date = event; return date; }}(Date);'
-          )
+          const fixedDate = new Date('March 08, 2019 00:00:00');
+          // @ts-ignore
+          win.Date = function(...args: any[]) {
+            if (args.length === 0) {
+              return fixedDate;
+            }
+            return new (Date as any)(...args);
+          };
+          win.Date.now = () => fixedDate.getTime();
+          win.Date.parse = (s: string) => Date.parse(s);
+          win.Date.UTC = (...args: any[]) => Date.UTC(...args);
         })
         cy.get('#collapseCouponElement').click()
 
