@@ -19,7 +19,30 @@ export function captchas () {
     const secondOperator = operators[Math.floor((Math.random() * 3))]
 
     const expression = firstTerm.toString() + firstOperator + secondTerm.toString() + secondOperator + thirdTerm.toString()
-    const answer = eval(expression).toString() // eslint-disable-line no-eval
+    
+    // Safely evaluate the expression without using eval()
+    const calculate = (a: number, op: string, b: number) => {
+      switch (op) {
+        case '+': return a + b
+        case '-': return a - b
+        case '*': return a * b
+        default: return 0
+      }
+    }
+
+    let answerNum: number
+    // Respect operator precedence: evaluate multiplication first, then left-to-right for addition/subtraction
+    if (secondOperator === '*') {
+      const intermediate = calculate(secondTerm, secondOperator, thirdTerm)
+      answerNum = calculate(firstTerm, firstOperator, intermediate)
+    } else if (firstOperator === '*') {
+      const intermediate = calculate(firstTerm, firstOperator, secondTerm)
+      answerNum = calculate(intermediate, secondOperator, thirdTerm)
+    } else {
+      const intermediate = calculate(firstTerm, firstOperator, secondTerm)
+      answerNum = calculate(intermediate, secondOperator, thirdTerm)
+    }
+    const answer = answerNum.toString()
 
     const captcha = {
       captchaId,
