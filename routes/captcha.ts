@@ -20,7 +20,7 @@ export function captchas () {
 
     const expression = firstTerm.toString() + firstOperator + secondTerm.toString() + secondOperator + thirdTerm.toString()
     
-    // Safely evaluate the expression without using eval()
+    // Safely calculate the expression result instead of using eval
     const calculate = (a: number, op: string, b: number) => {
       switch (op) {
         case '+': return a + b
@@ -31,13 +31,10 @@ export function captchas () {
     }
 
     let answerNum: number
-    // Respect operator precedence: evaluate multiplication first, then left-to-right for addition/subtraction
-    if (secondOperator === '*') {
+    // Handle operator precedence (* before + and -)
+    if (secondOperator === '*' && firstOperator !== '*') {
       const intermediate = calculate(secondTerm, secondOperator, thirdTerm)
       answerNum = calculate(firstTerm, firstOperator, intermediate)
-    } else if (firstOperator === '*') {
-      const intermediate = calculate(firstTerm, firstOperator, secondTerm)
-      answerNum = calculate(intermediate, secondOperator, thirdTerm)
     } else {
       const intermediate = calculate(firstTerm, firstOperator, secondTerm)
       answerNum = calculate(intermediate, secondOperator, thirdTerm)
